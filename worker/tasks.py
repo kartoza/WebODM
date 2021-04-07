@@ -22,14 +22,12 @@ from app.raster_utils import export_raster_index as export_raster_index_sync
 # import redis
 
 logger = get_task_logger("app.logger")
-# redis_client = redis.Redis.from_url(settings.CELERY_BROKER_URL)
 
 # What class to use for async results, since during testing we need to mock it
 TestSafeAsyncResult = worker.celery.MockAsyncResult if settings.TESTING else app.AsyncResult
 
 @app.task
 def update_nodes_info():
-    tasks = get_pending_tasks()
     processing_nodes = ProcessingNode.objects.all()
     for processing_node in processing_nodes:
         processing_node.update_node_info()
@@ -79,10 +77,6 @@ def setInterval(interval, func, *args):
 
 @app.task
 def process_task(taskId):
-    lock_id = 'task_lock_{}'.format(taskId)
-    cancel_monitor = None
-    delete_lock = True
-
     try:
         task = Task.objects.get(pk=taskId)
     except ObjectDoesNotExist:
@@ -97,48 +91,6 @@ def process_task(taskId):
             "Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
                 e, traceback.format_exc()))
         if settings.TESTING: raise e
-    #
-    # try:
-    #     task_lock_last_update = redis_client.getset(lock_id, time.time())
-    #     if task_lock_last_update is not None:
-    #         # Check if lock has expired
-    #         if time.time() - float(task_lock_last_update) <= 30:
-    #             # Locked
-    #             delete_lock = False
-    #             return
-    #         else:
-    #             # Expired
-    #             logger.warning("Task {} has an expired lock! This could mean that WebODM is running out of memory. Check your server configuration.")
-    #
-    #     # Set lock
-    #     def update_lock():
-    #         redis_client.set(lock_id, time.time())
-    #     cancel_monitor = setInterval(5, update_lock)
-    #
-    #     try:
-    #         task = Task.objects.get(pk=taskId)
-    #     except ObjectDoesNotExist:
-    #         logger.info("Task {} has already been deleted.".format(taskId))
-    #         return
-    #
-    #     try:
-    #         task.process()
-    #     except Exception as e:
-    #         logger.error(
-    #             "Uncaught error! This is potentially bad. Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
-    #                 e, traceback.format_exc()))
-    #         if settings.TESTING: raise e
-    # finally:
-    #     if cancel_monitor is not None:
-    #         cancel_monitor()
-    #
-    #     if delete_lock:
-    #         try:
-    #             redis_client.delete(lock_id)
-    #         except redis.exceptions.RedisError:
-    #             # Ignore errors, the lock will expire at some point
-    #             pass
-
 
 
 def get_pending_tasks():
