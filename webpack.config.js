@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 let path = require("path");
 let BundleTracker = require('webpack-bundle-tracker');
-let ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
@@ -24,9 +24,7 @@ module.exports = {
   plugins: [
     new LiveReloadPlugin({appendScriptTag: true}),
     new BundleTracker({filename: './webpack-stats.json'}),
-    new ExtractTextPlugin('css/[name]-[hash].css', {
-        allChunks: true
-    })
+    new MiniCssExtractPlugin({filename: 'css/[name]-[hash].css'})
   ],
 
   module: {
@@ -52,17 +50,16 @@ module.exports = {
       },
       {
         test: /\.s?css$/,
-        use: ExtractTextPlugin.extract({
-          use: [
-            { loader: 'css-loader' },
-            {
-                loader: 'sass-loader',
-                options: {
-                    implementation: require("sass")
-                }
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: require("sass")
             }
-          ]
-        })
+          }
+        ]
       },
       {
         test: /\.(png|jpg|jpeg|svg)/,
