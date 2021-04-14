@@ -19,7 +19,6 @@ from webodm import settings
 import worker
 from .celery import app
 from app.raster_utils import export_raster_index as export_raster_index_sync
-from app.utils.celery import single_instance_task
 
 logger = get_task_logger("app.logger")
 
