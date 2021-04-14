@@ -19,7 +19,7 @@ from webodm import settings
 import worker
 from .celery import app
 from app.raster_utils import export_raster_index as export_raster_index_sync
-# import redis
+from app.utils.celery import single_instance_task
 
 logger = get_task_logger("app.logger")
 
@@ -75,24 +75,6 @@ def setInterval(interval, func, *args):
     t.start()
     return stopped.set
 
-@app.task
-def process_task(taskId):
-    try:
-        task = Task.objects.get(pk=taskId)
-    except ObjectDoesNotExist:
-        logger.info("Task {} has already been deleted.".format(taskId))
-        return
-
-    try:
-        task.process()
-    except Exception as e:
-        logger.error(
-            "Uncaught error! This is potentially bad. "
-            "Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
-                e, traceback.format_exc()))
-        if settings.TESTING: raise e
-
-
 def get_pending_tasks():
     # All tasks that have a processing node assigned
     # Or that need one assigned (via auto)
@@ -103,6 +85,34 @@ def get_pending_tasks():
                                 Q(Q(status=None) | Q(status__in=[status_codes.QUEUED, status_codes.RUNNING]),
                                   processing_node__isnull=False, partial=False) |
                                 Q(pending_action__isnull=False, partial=False))
+
+
+@app.task
+def process_task(taskId):
+    from app.utils.celery import memcache_lock
+
+    lock_id = 'task_lock_{}'.format(taskId)
+
+    with memcache_lock(lock_id) as acquired:
+        if acquired:
+            try:
+                task = Task.objects.get(pk=taskId)
+            except ObjectDoesNotExist:
+                logger.info("Task {} has already been deleted.".format(taskId))
+                return
+
+            try:
+                task.process()
+            except Exception as e:
+                logger.error(
+                    "Uncaught error! This is potentially bad. "
+                    "Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
+                        e, traceback.format_exc()))
+                if settings.TESTING: raise e
+            return
+        logger.info(
+            'Task %s has already being processed by another worker', lock_id)
+
 
 @app.task
 def process_pending_tasks():
