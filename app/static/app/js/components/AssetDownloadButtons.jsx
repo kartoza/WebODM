@@ -29,11 +29,11 @@ class AssetDownloadButtons extends React.Component {
         const assetDownloads = AssetDownloads.only(this.props.task.available_assets);
 
         return (<div className={"asset-download-buttons " + (this.props.showLabel ? "btn-group" : "") + " " + (this.props.direction === "up" ? "dropup" : "")}>
-          <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-toggle="dropdown">
-            <i className="glyphicon glyphicon-download"></i>{this.props.showLabel ? " " + _("Download Assets") : ""}
+          <button type="button" className={"btn btn-sm " + this.props.buttonClass} disabled={this.props.disabled} data-bs-toggle="dropdown">
+            <i className="fas fa-download"></i>{this.props.showLabel ? " " + _("Download Assets") : ""}
           </button>
           {this.props.showLabel ? 
-          <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-toggle="dropdown" disabled={this.props.disabled}>
+          <button type="button" className={"btn btn-sm dropdown-toggle " + this.props.buttonClass} data-bs-toggle="dropdown" disabled={this.props.disabled}>
                 <span className="caret"></span>
           </button> : ""}
           <ul className="dropdown-menu">

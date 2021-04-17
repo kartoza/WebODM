@@ -485,7 +485,7 @@ class ModelView extends React.Component {
 
     return (<div className="model-view">
           <ErrorMessage bind={[this, "error"]} />
-          <div className="container potree_container" 
+          <div className="container-fluid potree_container"
              style={{height: "100%", width: "100%", position: "relative"}}
              onContextMenu={(e) => {e.preventDefault();}}>
                 <div id="potree_render_area" 

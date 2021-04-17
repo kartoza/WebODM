@@ -482,14 +482,14 @@ class ProjectListItem extends React.Component {
 
         <div className="row no-margin">
           <ErrorMessage bind={[this, 'error']} />
-          <div className="btn-group pull-right">
+          <div className="btn-group text-right d-inline">
             {this.hasPermission("add") ? 
               <div className={"asset-download-buttons btn-group " + (this.state.upload.uploading ? "hide" : "")}>
                 <button type="button" 
                       className="btn btn-primary btn-sm"
                       onClick={this.handleUpload}
                       ref={this.setRef("uploadButton")}>
-                  <i className="glyphicon glyphicon-upload"></i>
+                  <i className="fas fa-download"></i>
                   {_("Select Images and GCP")}
                 </button>
                 <button type="button" 
@@ -520,7 +520,7 @@ class ProjectListItem extends React.Component {
           <div className="project-description">
             {data.description}
           </div>
-          <div className="row project-links">
+          <div className="project-links">
             {numTasks > 0 ? 
               <span>
                 <i className='fa fa-tasks'>

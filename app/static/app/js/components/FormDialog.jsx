@@ -10,7 +10,7 @@ class FormDialog extends React.Component {
         title: _("Title"),
         saveLabel: _("Save"),
         savingLabel: _("Saving…"),
-        saveIcon: "glyphicon glyphicon-plus",
+        saveIcon: "fas fa-plus",
         deleteWarning: _("Are you sure?"),
         show: false
     };
@@ -137,8 +137,8 @@ class FormDialog extends React.Component {
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className="modal-header">
+                    <h5 className="modal-title" style={{"color": "black"}}>{this.props.title}</h5>
                     <button type="button" className="close" onClick={this.hide}><span>&times;</span></button>
-                    <h4 className="modal-title">{this.props.title}</h4>
                   </div>
                   <div className="modal-body">
                     <ErrorMessage bind={[this, "error"]} />
