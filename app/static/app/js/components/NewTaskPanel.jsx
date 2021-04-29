@@ -144,7 +144,7 @@ class NewTaskPanel extends React.Component {
                   <label className="col-sm-2 control-label">{_("Resize Images")}</label>
                   <div className="col-sm-10">
                       <div className="btn-group">
-                      <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                      <button type="button" className="btn btn-default dropdown-toggle" data-bs-toggle="dropdown">
                           {ResizeModes.toHuman(this.state.resizeMode)} <span className="caret"></span>
                       </button>
                       <ul className="dropdown-menu">

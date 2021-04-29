@@ -523,7 +523,7 @@ class EditTaskForm extends React.Component {
             <button type="button" className="btn btn-default" title={_("Edit Task Options")} onClick={this.handleEditPreset}>
             <i className="fa fa-sliders-h"></i> {_("Edit")}
             </button>
-            <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <button type="button" className="btn btn-default dropdown-toggle" data-bs-toggle="dropdown">
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu">
