@@ -291,6 +291,8 @@ class Map extends React.Component {
       maxZoom: 24
     });
 
+    this.props.onMapCreated(this.map)
+
     // For some reason, in production this class is not added (but we need it)
     // leaflet bug?
     $(this.container).addClass("leaflet-touch");

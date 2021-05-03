@@ -1,12 +1,17 @@
 const webpack = require('webpack');
 let path = require("path");
 let BundleTracker = require('webpack-bundle-tracker');
+const BundleClean = require('webpack-bundle-clean');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   mode: 'development',
   context: __dirname,
+
+  node: {
+    fs: 'empty'
+  },
 
   entry: {
     main: ['./app/static/app/js/main.jsx'],
@@ -23,6 +28,7 @@ module.exports = {
 
   plugins: [
     new LiveReloadPlugin({appendScriptTag: true}),
+    new BundleClean({filename: './webpack-stats.json'}),
     new BundleTracker({filename: './webpack-stats.json'}),
     new MiniCssExtractPlugin({filename: 'css/[name]-[hash].css'})
   ],

@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
+import MeasurementPanel from './components/MeasurementPanel';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
@@ -9,6 +10,7 @@ class MapView extends React.Component {
   static defaultProps = {
     mapItems: [],
     selectedMapType: 'orthophoto',
+    map: null,
     title: "",
     public: false
   };
@@ -25,11 +27,13 @@ class MapView extends React.Component {
 
     this.state = {
       selectedMapType: props.selectedMapType,
-      tiles: this.getTilesByMapType(props.selectedMapType)
+      tiles: this.getTilesByMapType(props.selectedMapType),
+      currentMap: null
     };
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
+    this.handleMapCreated = this.handleMapCreated.bind(this);
   }
 
   getTilesByMapType(type){
@@ -57,6 +61,10 @@ class MapView extends React.Component {
         tiles: this.getTilesByMapType(type)
       });
     };
+  }
+
+  handleMapCreated(map) {
+    this.setState({ currentMap: map })
   }
 
   render(){
@@ -101,11 +109,13 @@ class MapView extends React.Component {
             : <h3>&nbsp;</h3>}
 
         <div className="map-container">
+            <MeasurementPanel map={this.state.currentMap}/>
             <Map 
                 tiles={this.state.tiles} 
                 showBackground={true} 
                 mapType={this.state.selectedMapType} 
                 public={this.props.public}
+                onMapCreated={this.handleMapCreated}
             />
         </div>
       </div>);
