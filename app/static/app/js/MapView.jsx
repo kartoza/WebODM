@@ -95,25 +95,26 @@ class MapView extends React.Component {
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
     return (<div className="map-view">
-        <div className="map-type-selector btn-group" role="group">
-          {mapTypeButtons.map(mapType =>
-            <button 
-              key={mapType.type}
-              onClick={this.handleMapTypeButton(mapType.type)}
-              className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i> {mapType.label}</button>
-          )}
-        </div>
 
-        {this.props.title ? 
-          <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
-            : <h3>&nbsp;</h3>}
+        {this.props.title ?
+          <div className="map-header">
+            <div className="map-type-selector btn-group" role="group">
+              {mapTypeButtons.map(mapType =>
+                <button
+                  key={mapType.type}
+                  onClick={this.handleMapTypeButton(mapType.type)}
+                  className={"btn btn-sm " + (mapType.type === this.state.selectedMapType ? "btn-primary" : "btn-default")}><i className={mapType.icon}></i> {mapType.label}</button>
+              )}
+            </div>
+            <h3><i className="fa fa-globe"></i> {this.props.title}</h3>
+          </div> : null }
 
         <div className="map-container">
             <MeasurementPanel map={this.state.currentMap}/>
-            <Map 
-                tiles={this.state.tiles} 
-                showBackground={true} 
-                mapType={this.state.selectedMapType} 
+            <Map
+                tiles={this.state.tiles}
+                showBackground={true}
+                mapType={this.state.selectedMapType}
                 public={this.props.public}
                 onMapCreated={this.handleMapCreated}
             />

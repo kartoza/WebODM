@@ -1,9 +1,9 @@
 [data-mapview]{
-    height: calc(100vh - 100px);
+    height: calc(100vh - 70px);
 }
 
 .map-view{
-    height: calc(100% - 20px);
+    height: calc(100%);
     position: relative;
 
     input[type="range"]{
@@ -14,10 +14,6 @@
         top: 6px;
     }
 
-    .map-type-selector{
-        float: right;
-    }
-
     .map-container{
         height: 100%;
         position: relative;
@@ -25,4 +21,24 @@
             z-index: 99999;
         }
     }
+}
+
+.container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.map-header {
+    position: absolute;
+    z-index: 999;
+    padding-left: 320px;
+    text-shadow: 2px 2px #000000;
+}
+
+.content {
+    padding-top: 0 !important;
+}
+
+#page-wrapper {
+    padding-bottom: 0 !important;
 }
