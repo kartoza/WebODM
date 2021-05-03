@@ -265,3 +265,7 @@ footer{
 .floatfix{
     clear: both;
 }
+
+.leaflet-control-measure {
+    display: none !important;
+}
