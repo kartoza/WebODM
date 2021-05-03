@@ -63,6 +63,7 @@ class Map extends React.Component {
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
+    this.loadMeasurementData = this.loadMeasurementData.bind(this);
   }
 
   updateOpacity = (evt) => {
@@ -88,6 +89,64 @@ class Map extends React.Component {
               return _("DTM");
       }
       return "";
+  }
+
+  loadMeasurementData() {
+      const self = this;
+      // Cancel previous requests
+      if (this.measurementJsonRequests) {
+          this.measurementJsonRequests.forEach(measurementJsonRequest => measurementJsonRequest.abort());
+          this.measurementJsonRequests = [];
+      }
+      return new Promise((resolve, reject) => {
+            self.measurementJsonRequests = [];
+            // Query user measurement data
+            $.ajax({
+                url: `/list-user-measurement/`,
+                contentType: 'application/json',
+                type: 'GET'
+            }).done(json => {
+                if (json) {
+                    for (let i = 0; i < json.length; i++) {
+                        const measurementData = json[i];
+                        const re = /(?:\.([^.]+))?$/;
+                        const extension = re.exec(measurementData.measurement_data)[1];
+                        if (extension === 'txt' || extension.includes('json')) {
+                            self.measurementJsonRequests.push($.getJSON(measurementData.measurement_data, function(jsonMeasurementData) {
+                                if (jsonMeasurementData.type === 'FeatureCollection') {
+                                    if (!('crs' in jsonMeasurementData)) {
+                                        jsonMeasurementData['crs'] = {
+                                            "type": "name",
+                                            "properties": {
+                                                "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+                                            }
+                                        }
+                                    }
+                                    const parts = [new Blob([JSON.stringify(jsonMeasurementData, null, 4)], {type: "application/json;charset=utf-8"})];
+                                    const file = new File(parts, measurementData.label, {type: "application/json;charset=utf-8", lastModified: new Date()[0]});
+                                    addTempLayer(file, (err, tempLayer, filename) => {
+                                        if (typeof tempLayer === 'undefined') {
+                                            return true;
+                                        }
+                                        if (!err){
+                                          tempLayer.addTo(self.map);
+                                          tempLayer[Symbol.for("meta")] = {name: filename};
+                                          self.setState(update(self.state, {
+                                             overlays: {$push: [tempLayer]}
+                                          }));
+                                        }else{
+                                          self.setState({ error: err.message || JSON.stringify(err) });
+                                        }
+                                        self.setState({showLoading: false});
+                                      });
+                                }
+                            }))
+                        }
+                    }
+                    resolve()
+                }
+            }).fail(reject);
+      })
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -466,6 +525,11 @@ _('Example:'),
     }).catch(e => {
         this.setState({showLoading: false, error: e.message});
     });
+
+    this.setState({showLoading: true});
+    this.loadMeasurementData().then(() => {
+        this.setState({showLoading: false})
+    })
 
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map,

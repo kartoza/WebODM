@@ -1,4 +1,6 @@
 import shp from 'shpjs';
+import "proj4leaflet";
+import proj4 from 'proj4';
 import { _, interpolate } from './gettext';
 
 export function addTempLayer(file, cb) {
@@ -49,8 +51,11 @@ export function addTempLayer(file, cb) {
   }
 
   let addLayer = (_geojson) => {
+    proj4.defs('EPSG:32615', '+proj=utm +zone=15 +ellps=WGS84 +datum=WGS84 +units=m +no_defs');
+    proj4.defs('EPSG:3857', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\n');
+    proj4.defs['OGC:CRS84'] = proj4.defs['EPSG:4326'];
     let tempLayer =
-      L.geoJson(_geojson, {
+      L.Proj.geoJson(_geojson, {
         style: function (feature) {
           return {
             opacity: 1,

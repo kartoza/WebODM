@@ -42,3 +42,9 @@
 #page-wrapper {
     padding-bottom: 0 !important;
 }
+
+.alert-warning {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+}
