@@ -1,7 +1,6 @@
 import React from 'react';
 import './css/MapView.scss';
 import Map from './components/Map';
-import MeasurementPanel from './components/MeasurementPanel';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
@@ -110,7 +109,6 @@ class MapView extends React.Component {
           </div> : null }
 
         <div className="map-container">
-            <MeasurementPanel map={this.state.currentMap}/>
             <Map
                 tiles={this.state.tiles}
                 showBackground={true}

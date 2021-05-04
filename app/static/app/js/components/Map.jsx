@@ -27,6 +27,8 @@ import Utils from '../classes/Utils';
 import '../vendor/leaflet/Leaflet.Ajax';
 import '../vendor/leaflet/Leaflet.Awesome-markers';
 import { _ } from '../classes/gettext';
+import MeasurementTable from "./MeasurementTable";
+import MeasurementPanel from "./MeasurementPanel";
 
 class Map extends React.Component {
   static defaultProps = {
@@ -46,24 +48,28 @@ class Map extends React.Component {
     super(props);
     
     this.state = {
+      map: null,
       error: "",
       singleTask: null, // When this is set to a task, show a switch mode button to view the 3d model
       pluginActionButtons: [],
       showLoading: false, // for drag&drop of files and first load
       opacity: 100,
       imageryLayers: [],
-      overlays: []
+      overlays: [],
+      measurementData: []
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
     this.addedCameraShots = false;
+    this.newMeasurementData = [];
 
     this.loadImageryLayers = this.loadImageryLayers.bind(this);
     this.updatePopupFor = this.updatePopupFor.bind(this);
     this.handleMapMouseDown = this.handleMapMouseDown.bind(this);
     this.loadMeasurementData = this.loadMeasurementData.bind(this);
+    this.measurementUpdated = this.measurementUpdated.bind(this);
   }
 
   updateOpacity = (evt) => {
@@ -89,6 +95,26 @@ class Map extends React.Component {
               return _("DTM");
       }
       return "";
+  }
+
+  measurementUpdated(features) {
+      for (let key in features) {
+          const feature = features[key];
+          const _id = feature._leaflet_id;
+          if (this.newMeasurementData.includes(_id)) {
+              continue
+          }
+          this.newMeasurementData.push(_id)
+          const _label = `Measurement ${this.newMeasurementData.length}`;
+          feature['feature'] = feature._measurePopup.getGeoJSON();
+          feature[Symbol.for("meta")] = {name: _label};
+          const _measurementData = feature._measurePopup.getProperties();
+          _measurementData['name'] = _label;
+          this.setState(update(this.state, {
+              overlays: {$push: [feature]},
+              measurementData: {$push: [_measurementData]}
+          }));
+      }
   }
 
   loadMeasurementData() {
@@ -124,6 +150,12 @@ class Map extends React.Component {
                                     }
                                     const parts = [new Blob([JSON.stringify(jsonMeasurementData, null, 4)], {type: "application/json;charset=utf-8"})];
                                     const file = new File(parts, measurementData.label, {type: "application/json;charset=utf-8", lastModified: new Date()[0]});
+                                    jsonMeasurementData.features.forEach((feature) => {
+                                        feature.properties['name'] = measurementData.label
+                                        self.setState(update(self.state, {
+                                            measurementData: {$push: [feature.properties]}
+                                        }));
+                                    })
                                     addTempLayer(file, (err, tempLayer, filename) => {
                                         if (typeof tempLayer === 'undefined') {
                                             return true;
@@ -205,7 +237,6 @@ class Map extends React.Component {
                     console.warn("Cannot find min/max statistics for dataset, setting to -1,1");
                     params["rescale"] = encodeURIComponent("-1,1");
                 }
-                
                 tileUrl = Utils.buildUrlWithQuery(tileUrl, params);
             }
 
@@ -351,6 +382,7 @@ class Map extends React.Component {
     });
 
     this.props.onMapCreated(this.map)
+    this.setState({map: this.map});
 
     // For some reason, in production this class is not added (but we need it)
     // leaflet bug?
@@ -585,6 +617,8 @@ _('Example:'),
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
+        <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
+        <MeasurementTable measurementData={this.state.measurementData}/>
         <div className="opacity-slider theme-secondary hidden-xs">
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>

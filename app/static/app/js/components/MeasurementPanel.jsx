@@ -9,7 +9,10 @@ import {_} from "../classes/gettext";
 
 
 class MeasurementPanel extends React.Component {
-
+    static propTypes = {
+        measurementUpdated: PropTypes.func,
+        map: PropTypes.object.isRequired
+    };
      constructor(props) {
          super(props);
 
@@ -61,16 +64,18 @@ class MeasurementPanel extends React.Component {
 
     getMeasurementFeatures(){
         const features = [];
+        const layers = [];
         this.state.map.eachLayer(layer => {
             const mp = layer._measurePopup;
             if (mp) {
+                layers.push(layer)
                 features.push(mp.getGeoJSON());
             }
         });
         this.setState({
             measurementFeatures: features
         })
-        console.log(features)
+        this.props.measurementUpdated(layers)
         return features
     }
 
