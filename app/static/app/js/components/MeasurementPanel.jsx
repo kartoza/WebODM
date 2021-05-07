@@ -160,23 +160,22 @@ class MeasurementPanel extends React.Component {
                     ref={(domNode) => { this.projectDialog = domNode; }}
                 />
                 <div style={{position: "absolute", zIndex: 9999, width: "300px"}} className="measurementPanel">
+                    <p className={"panelTitle"}>TOOLS</p>
                     <div id="accordion">
                         <div className="card">
                             <div className="card-header" id="headingOne">
-                                <h5 className="mb-0">
-                                    <button className="btn btn-link"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#collapseOne"
-                                            aria-expanded="true"
-                                            aria-controls="collapseOne">
-                                        {this.state.loading ? <p>Loading...</p> : <p>Volume Measurement</p>}
-                                    </button>
-                                </h5>
+                                <div className="panelMenu"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne"
+                                        aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                    {this.state.loading ? <p>Loading...</p> : <p>Measure Volume</p>}
+                                </div>
                             </div>
                             <div id="collapseOne" className="collapse"
                                  aria-labelledby="headingOne"
                                  data-parent="#accordion">
-                                <div className="card-body" style={{ backgroundColor: "#000000"}}>
+                                <div className="card-body" style={{ backgroundColor: "#294348" }}>
                                     <div className="btn-group" role="group"
                                          aria-label="Basic example">
                                         {!this.state.startMeasuring ?
