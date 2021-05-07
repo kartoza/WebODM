@@ -280,3 +280,71 @@ footer{
     -webkit-user-select: none;
     -o-user-select: none;
 }
+
+.panelTitle {
+    color: #69de52;
+    padding-left: 0.5em;
+    padding-top: 0.5em;
+    letter-spacing: 1px;
+}
+
+.measurementPanel {
+    background-color: #1a2326;
+    padding: 10px;
+    border-radius: 0.5em;
+    font-size: 0.8em;
+}
+
+.measurementPanel {
+    margin-top: 1em;
+    margin-left: 1em;
+}
+
+.measurementPanel .card{
+    opacity: 95%;
+    color: white;
+    border: 0;
+}
+
+.measurementPanel .card-header {
+    background-color: #1a2326;
+    color: white;
+    border-radius: 0;
+    border: 1px solid #294348;
+    font-size: 1.1em;
+    padding: 0;
+}
+
+.measurementPanel .card-header:hover {
+    cursor: pointer;
+}
+
+.measurementPanel .card-header p {
+    color: white;
+    margin-bottom: 0 !important;
+}
+
+.measurementPanel button:focus {
+    outline: 0 !important;
+    border: 0;
+}
+
+.panelMenu {
+    padding: 10px;
+}
+
+.measurementPanel .btn {
+    font-size: 1.1em !important;
+}
+
+.measurementPanel .btn-group {
+    width: 100%;
+}
+
+.measurementPanel .btn-primary:active {
+    background-color: #346f28 !important;
+}
+
+.measurementPanel .btn-primary:focus {
+    background-color: #346f28 !important;
+}
