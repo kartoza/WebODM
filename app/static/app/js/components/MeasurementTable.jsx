@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import update from "immutability-helper";
 
 
 class MeasurementTable extends React.Component {
@@ -26,7 +25,7 @@ class MeasurementTable extends React.Component {
             <table className="table">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">•</th>
                     <th scope="col">Name</th>
                     <th scope="col">Length (m&sup2;)</th>
                     <th scope="col">Area (m&sup2;)</th>
@@ -36,7 +35,7 @@ class MeasurementTable extends React.Component {
                 <tbody>
                 { this.props.measurementData.map((object, i) => (
                     <tr key={i}>
-                        <td>{i + 1}</td>
+                        <td><div className={"measurementColor"} style={{ backgroundColor: object['color'] ? object['color'] : '#555555' }}>&nbsp;</div></td>
                         <td>{ object['name'] ? object['name'] : '-' }</td>
                         <td>{ object['Length'] ? parseFloat(object['Length']).toFixed(2) : '-' }</td>
                         <td>{ object['Area'] ? parseFloat(object['Area']).toFixed(2) : '-'}</td>

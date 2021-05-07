@@ -150,27 +150,30 @@ class Map extends React.Component {
                                     }
                                     const parts = [new Blob([JSON.stringify(jsonMeasurementData, null, 4)], {type: "application/json;charset=utf-8"})];
                                     const file = new File(parts, measurementData.label, {type: "application/json;charset=utf-8", lastModified: new Date()[0]});
-                                    jsonMeasurementData.features.forEach((feature) => {
-                                        feature.properties['name'] = measurementData.label
-                                        self.setState(update(self.state, {
-                                            measurementData: {$push: [feature.properties]}
-                                        }));
-                                    })
                                     addTempLayer(file, (err, tempLayer, filename) => {
                                         if (typeof tempLayer === 'undefined') {
                                             return true;
                                         }
-                                        if (!err){
-                                          tempLayer.addTo(self.map);
-                                          tempLayer[Symbol.for("meta")] = {name: filename};
-                                          self.setState(update(self.state, {
-                                             overlays: {$push: [tempLayer]}
-                                          }));
-                                        }else{
-                                          self.setState({ error: err.message || JSON.stringify(err) });
+
+                                        if (!err) {
+                                            tempLayer.addTo(self.map);
+                                            tempLayer[Symbol.for("meta")] = {name: filename};
+                                            for (const [key, value] of Object.entries(tempLayer._layers)) {
+                                                const feature = value.feature;
+                                                feature.properties['name'] = measurementData.label;
+                                                feature.properties['color'] = value.options.color;
+                                                self.setState(update(self.state, {
+                                                    measurementData: {$push: [feature.properties]}
+                                                }));
+                                            }
+                                            self.setState(update(self.state, {
+                                                overlays: {$push: [tempLayer]}
+                                            }));
+                                        } else {
+                                            self.setState({error: err.message || JSON.stringify(err)});
                                         }
                                         self.setState({showLoading: false});
-                                      });
+                                    });
                                 }
                             }))
                         }

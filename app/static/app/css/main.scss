@@ -269,3 +269,14 @@ footer{
 .leaflet-control-measure {
     display: none !important;
 }
+
+.measurementColor {
+    background-color: #0a53be;
+    width: 1em;
+    border-radius: 2em;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
