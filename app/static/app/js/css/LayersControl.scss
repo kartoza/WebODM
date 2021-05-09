@@ -3,9 +3,12 @@
   
   a.leaflet-control-layers-control-button{
     background: url(../icons/layers.svg) 0 0 no-repeat;
-    background-size: 26px 26px;
+    border-bottom: 0 !important;
+    background-color: #1a2326 !important;
+    background-size: 30px 30px;
     border-radius: 2px;
-    background-position: 2px 2px;
+    background-position: 4px 4px;
+    padding: 1.6em;
   }
 
   div.layers-control-panel{ display: none; }
