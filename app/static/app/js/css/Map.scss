@@ -13,6 +13,10 @@
         padding-bottom: 6px;
     }
 
+    .leaflet-control-layers, .leaflet-control-add-overlay, .opacity-slider {
+        display: none;
+    }
+
     .leaflet-touch .leaflet-control-layers-toggle, .leaflet-control-layers-toggle{
         background: no-repeat center/90% url(../icons/basemap.svg);
         border-radius: 2px;
@@ -62,9 +66,9 @@
 
     .actionButtons{
         position: absolute;
-        z-index: 2000;
-        right: 12px;
-        bottom: 20px;
+        z-index: 999;
+        right: 70px;
+        top: 10px;
         & > *{
             display: inline-block;
             margin-left: 12px;

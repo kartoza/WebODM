@@ -54,7 +54,7 @@ class SwitchModeButton extends React.Component {
         onClick={this.handleClick}
         type="button"
         className={"switchModeButton btn btn-sm btn-secondary " + (!this.props.task ? "hide" : "")}>
-        <i className={"fa " + (this.icon())}></i> {this.text()}
+        {this.text()}
       </button>
     );
   }
