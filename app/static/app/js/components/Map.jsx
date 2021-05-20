@@ -122,6 +122,7 @@ class Map extends React.Component {
 
   async loadUploadedLayers() {
       let layers = [];
+      let icon = 'fa fa-draw-polygon fa-fw';
       let geoserverUrl = this.props.geoserverUrl;
       if (!geoserverUrl)
           return false;
@@ -141,7 +142,7 @@ class Map extends React.Component {
                   transparent: true,
               }
               let wmsLayer = L.tileLayer.wms(geoserverUrl + '/gwc/service/wms', wmsOptions);
-              wmsLayer[Symbol.for("meta")] = {name: layer.title};
+              wmsLayer[Symbol.for("meta")] = {name: layer.title, icon: icon};
               const bbox = userLayer.getBoundingBox(layer.layer);
               if (bbox)
                 wmsLayer.options['bounds'] = userLayer.getBoundingBox(layer.layer);
