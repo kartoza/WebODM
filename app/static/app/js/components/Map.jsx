@@ -59,7 +59,8 @@ class Map extends React.Component {
       opacity: 100,
       imageryLayers: [],
       overlays: [],
-      measurementData: []
+      measurementData: [],
+      measurementLayers: []
     };
 
     this.basemaps = {};
@@ -201,7 +202,7 @@ class Map extends React.Component {
                                                 }));
                                             }
                                             self.setState(update(self.state, {
-                                                overlays: {$push: [tempLayer]}
+                                                measurementLayers: {$push: [tempLayer]}
                                             }));
                                         } else {
                                             self.setState({error: err.message || JSON.stringify(err)});
@@ -487,7 +488,8 @@ _('Example:'),
 
     this.layersControl = new LayersControl({
         layers: this.state.imageryLayers,
-        overlays: this.state.overlays
+        overlays: this.state.overlays,
+        measurementLayers: this.state.measurementLayers
     }).addTo(this.map);
 
     this.autolayers = Leaflet.control.autolayers({
@@ -636,8 +638,8 @@ _('Example:'),
     }
 
     if (this.layersControl && (prevState.imageryLayers !== this.state.imageryLayers ||
-                            prevState.overlays !== this.state.overlays)){
-        this.layersControl.update(this.state.imageryLayers, this.state.overlays);
+                            prevState.overlays !== this.state.overlays) || prevState.measurementLayers !== this.state.measurementLayers){
+        this.layersControl.update(this.state.imageryLayers, this.state.overlays, this.state.measurementLayers);
     }
   }
 
