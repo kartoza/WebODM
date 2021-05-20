@@ -2,9 +2,9 @@
   padding: 10px 15px 10px 10px;
   background: #1a2326;
   color: #ebecec;
-  width: 300px;
+  width: 350px;
   min-height: 74px;
-  max-height: 400px;
+  max-height: 450px;
   overflow-y: auto;
 
   .loading{
@@ -46,5 +46,14 @@
 
   *{
       font-size: 12px;
+  }
+
+  .left-space {
+    margin-left: 1em;
+  }
+
+  .expand-button-container {
+    display: flex;
+    font-weight: bolder;
   }
 }
