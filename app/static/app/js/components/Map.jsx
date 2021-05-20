@@ -8,6 +8,8 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 // import '../vendor/leaflet/L.TileLayer.NoGap';
 import Dropzone from '../vendor/dropzone';
 import $ from 'jquery';
@@ -29,6 +31,7 @@ import '../vendor/leaflet/Leaflet.Awesome-markers';
 import { _ } from '../classes/gettext';
 import MeasurementTable from "./MeasurementTable";
 import MeasurementPanel from "./MeasurementPanel";
+import UserLayers from "../classes/UserLayers";
 
 class Map extends React.Component {
   static defaultProps = {
@@ -117,28 +120,58 @@ class Map extends React.Component {
       }
   }
 
+  async loadUploadedLayers() {
+      let layers = [];
+      let geoserverUrl = this.props.geoserverUrl;
+      if (!geoserverUrl)
+          return false;
+      let userLayer = new UserLayers({}, geoserverUrl);
+      try {
+          layers = await userLayer.getUploaderLayers();
+          await userLayer.getCapabilities();
+      } catch (err) {
+          console.log('Error retrieving user layers');
+      }
+      if (layers && layers.length > 0) {
+          for (let i = 0; i < layers.length; i++) {
+              const layer = layers[i];
+              let wmsOptions = {
+                  layers: layer.layer,
+                  format: 'image/png',
+                  transparent: true,
+              }
+              let wmsLayer = L.tileLayer.wms(geoserverUrl + '/gwc/service/wms', wmsOptions);
+              wmsLayer[Symbol.for("meta")] = {name: layer.title};
+              const bbox = userLayer.getBoundingBox(layer.layer);
+              if (bbox)
+                wmsLayer.options['bounds'] = userLayer.getBoundingBox(layer.layer);
+              this.setState(update(this.state, {
+                  overlays: {$push: [wmsLayer]}
+              }));
+          }
+      }
+  }
+
   loadMeasurementData() {
       const self = this;
       // Cancel previous requests
       if (this.measurementJsonRequests) {
           this.measurementJsonRequests.forEach(measurementJsonRequest => measurementJsonRequest.abort());
-          this.measurementJsonRequests = [];
       }
+      self.measurementJsonRequests = []
       return new Promise((resolve, reject) => {
-            self.measurementJsonRequests = [];
-            // Query user measurement data
             $.ajax({
                 url: `/list-user-measurement/`,
                 contentType: 'application/json',
                 type: 'GET'
-            }).done(json => {
+            }).done(async json => {
                 if (json) {
                     for (let i = 0; i < json.length; i++) {
                         const measurementData = json[i];
                         const re = /(?:\.([^.]+))?$/;
                         const extension = re.exec(measurementData.measurement_data)[1];
                         if (extension === 'txt' || extension.includes('json')) {
-                            self.measurementJsonRequests.push($.getJSON(measurementData.measurement_data, function(jsonMeasurementData) {
+                            self.measurementJsonRequests.push(await $.getJSON(measurementData.measurement_data, function(jsonMeasurementData) {
                                 if (jsonMeasurementData.type === 'FeatureCollection') {
                                     if (!('crs' in jsonMeasurementData)) {
                                         jsonMeasurementData['crs'] = {
@@ -182,6 +215,11 @@ class Map extends React.Component {
                 }
             }).fail(reject);
       })
+  }
+
+  async loadUserLayers() {
+      await this.loadMeasurementData()
+      await this.loadUploadedLayers()
   }
 
   loadImageryLayers(forceAddLayers = false){
@@ -562,9 +600,9 @@ _('Example:'),
     });
 
     this.setState({showLoading: true});
-    this.loadMeasurementData().then(() => {
-        this.setState({showLoading: false})
-    })
+
+    // Load created and uploaded layers
+    this.loadUserLayers();
 
     PluginsAPI.Map.triggerDidAddControls({
       map: this.map,

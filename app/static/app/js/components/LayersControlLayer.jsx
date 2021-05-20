@@ -115,7 +115,8 @@ export default class LayersControlLayer extends React.Component {
     const bounds = layer.options.bounds !== undefined ? 
                    layer.options.bounds :
                    layer.getBounds();
-    this.map.fitBounds(bounds);
+    if (bounds)
+        this.map.fitBounds(bounds);
 
     if (layer.getPopup()) layer.openPopup();
   }

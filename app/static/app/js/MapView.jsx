@@ -23,7 +23,6 @@ class MapView extends React.Component {
 
   constructor(props){
     super(props);
-
     this.state = {
       selectedMapType: props.selectedMapType,
       tiles: this.getTilesByMapType(props.selectedMapType),
@@ -115,6 +114,7 @@ class MapView extends React.Component {
                 mapType={this.state.selectedMapType}
                 public={this.props.public}
                 onMapCreated={this.handleMapCreated}
+                geoserverUrl={this.props.geoserver_url ? this.props.geoserver_url : ''}
             />
         </div>
       </div>);
