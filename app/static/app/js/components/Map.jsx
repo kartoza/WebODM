@@ -34,6 +34,7 @@ import MeasurementPanel from "./MeasurementPanel";
 import RequestServicePanel from "./RequestServicePanel";
 import UserLayers from "../classes/UserLayers";
 import MapTools from "../classes/MapTools";
+import WorkOrders from "../classes/WorkOrders";
 
 class Map extends React.Component {
   static defaultProps = {
@@ -64,7 +65,8 @@ class Map extends React.Component {
       imageryLayers: [],
       overlays: [],
       measurementData: [],
-      measurementLayers: []
+      measurementLayers: [],
+      workOrderTypeList: []
     };
 
     this.basemaps = {};
@@ -629,6 +631,13 @@ _('Example:'),
         pluginActionButtons: {$push: [button]}
       }));
     });
+
+    // Get work order type list
+    WorkOrders.getWorkOrderList().then(data => {
+        this.setState({
+            workOrderTypeList: data
+        })
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -669,7 +678,7 @@ _('Example:'),
             <div>
                 <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
                 <MeasurementTable measurementData={this.state.measurementData}/>
-            </div> : <RequestServicePanel/>
+            </div> : <RequestServicePanel workOrderTypeList={this.state.workOrderTypeList}/>
         }
         <div className="opacity-slider theme-secondary hidden-xs">
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
