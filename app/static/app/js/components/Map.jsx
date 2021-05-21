@@ -31,20 +31,24 @@ import '../vendor/leaflet/Leaflet.Awesome-markers';
 import { _ } from '../classes/gettext';
 import MeasurementTable from "./MeasurementTable";
 import MeasurementPanel from "./MeasurementPanel";
+import RequestServicePanel from "./RequestServicePanel";
 import UserLayers from "../classes/UserLayers";
+import MapTools from "../classes/MapTools";
 
 class Map extends React.Component {
   static defaultProps = {
     showBackground: false,
     mapType: "orthophoto",
-    public: false
+    public: false,
+    currentTool: MapTools.measurementTool
   };
 
   static propTypes = {
     showBackground: PropTypes.bool,
     tiles: PropTypes.array.isRequired,
     mapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
-    public: PropTypes.bool
+    public: PropTypes.bool,
+    currentTool: PropTypes.string
   };
 
   constructor(props) {
@@ -661,8 +665,12 @@ _('Example:'),
     return (
       <div style={{height: "100%"}} className="map">
         <ErrorMessage bind={[this, 'error']} />
-        <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
-        <MeasurementTable measurementData={this.state.measurementData}/>
+        { this.props.currentTool === MapTools.measurementTool ?
+            <div>
+                <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
+                <MeasurementTable measurementData={this.state.measurementData}/>
+            </div> : <RequestServicePanel/>
+        }
         <div className="opacity-slider theme-secondary hidden-xs">
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>

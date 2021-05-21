@@ -1,10 +1,8 @@
 import React from 'react';
-import L from 'leaflet';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 import Utils from '../classes/Utils';
 import SaveMeasurementDialog from './SaveMeasurementDialog';
-import EditProjectDialog from "./EditProjectDialog";
 import {_} from "../classes/gettext";
 
 
@@ -17,7 +15,7 @@ class MeasurementPanel extends React.Component {
          super(props);
 
          this.state = {
-             loading: true,
+             loading: false,
              map: null,
              startMeasuring: false,
              measurementFeatures: [],
