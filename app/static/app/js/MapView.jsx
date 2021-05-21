@@ -4,6 +4,11 @@ import Map from './components/Map';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import { _, interpolate } from './classes/gettext';
+import { createBrowserHistory } from "history";
+import {HashRouter} from "react-router-dom";
+import MapTools from './classes/MapTools';
+
+const history = createBrowserHistory();
 
 class MapView extends React.Component {
   static defaultProps = {
@@ -18,7 +23,8 @@ class MapView extends React.Component {
       mapItems: PropTypes.array.isRequired, // list of dictionaries where each dict is a {mapType: 'orthophoto', url: <tiles.json>},
       selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
-      public: PropTypes.bool
+      public: PropTypes.bool,
+      history: PropTypes.object
   };
 
   constructor(props){
@@ -26,7 +32,8 @@ class MapView extends React.Component {
     this.state = {
       selectedMapType: props.selectedMapType,
       tiles: this.getTilesByMapType(props.selectedMapType),
-      currentMap: null
+      currentMap: null,
+      mapTool: MapTools.measurementTool
     };
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
@@ -61,6 +68,21 @@ class MapView extends React.Component {
     };
   }
 
+  updateCurrentService(hash) {
+    if (hash.includes(MapTools.serviceTool)) {
+        this.setState({ mapTool: MapTools.serviceTool })
+      } else {
+        this.setState({ mapTool: MapTools.measurementTool })
+      }
+  }
+
+  componentDidMount() {
+    this.updateCurrentService(history.location.hash);
+    this.props.history.listen((location, action) => {
+      this.updateCurrentService(location.hash);
+    });
+  }
+
   handleMapCreated(map) {
     this.setState({ currentMap: map })
   }
@@ -93,7 +115,6 @@ class MapView extends React.Component {
     if (mapTypeButtons.length === 1) mapTypeButtons = [];
 
     return (<div className="map-view">
-
         {this.props.title ?
           <div className="map-header">
             <div className="map-type-selector btn-group" role="group">
@@ -114,6 +135,7 @@ class MapView extends React.Component {
                 mapType={this.state.selectedMapType}
                 public={this.props.public}
                 onMapCreated={this.handleMapCreated}
+                currentTool={this.state.mapTool}
                 geoserverUrl={this.props.geoserver_url ? this.props.geoserver_url : ''}
             />
         </div>
@@ -124,8 +146,9 @@ class MapView extends React.Component {
 $(function(){
     $("[data-mapview]").each(function(){
         let props = $(this).data();
+        props.history = history;
         delete(props.mapview);
-        window.ReactDOM.render(<MapView {...props}/>, $(this).get(0));
+        window.ReactDOM.render(<HashRouter><MapView {...props}/></HashRouter>, $(this).get(0));
     });
 });
 
