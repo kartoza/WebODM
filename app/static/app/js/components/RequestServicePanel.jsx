@@ -43,6 +43,9 @@ class RequestServicePanel extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleAreaBtn = this.handleAreaBtn.bind(this);
         this.drawInMap = this.drawInMap.bind(this);
+        this.disableMapExtentEvents = this.disableMapExtentEvents.bind(this);
+        this.enableMapExtentEvents = this.enableMapExtentEvents.bind(this);
+        this.getMapExtent = this.getMapExtent.bind(this);
     }
 
     getInitialState = (props) => {
@@ -89,6 +92,16 @@ class RequestServicePanel extends React.Component {
         })
     }
 
+    disableMapExtentEvents() {
+        this.props.map.off('zoomend', this.getMapExtent);
+        this.props.map.off('dragend', this.getMapExtent);
+    }
+
+    enableMapExtentEvents() {
+        this.props.map.on('zoomend', this.getMapExtent);
+        this.props.map.on('dragend', this.getMapExtent);
+    }
+
     getMapExtent() {
         let bounds = this.props.map.getBounds();
         let northWest = bounds.getNorthWest(),
@@ -126,7 +139,6 @@ class RequestServicePanel extends React.Component {
                  var type = e.layerType,
                      layer = e.layer;
                  that.props.serviceLayer.addLayer(layer);
-                 console.log(layer.toGeoJSON())
                  that.setState({
                      areaDrawn: true,
                      areaGeojson: layer.toGeoJSON()
@@ -162,7 +174,14 @@ class RequestServicePanel extends React.Component {
                                             <hr/>
                                             <div className="mb-2 align-items-center">
                                                 <label
-                                                    className="col-form-label control-label">Area</label>
+                                                    className="col-form-label control-label">Area {this.state.areaGeojson ? <span className="fas fa-redo clear-service-area" onClick={() => {
+                                                        this.clearDrawing();
+                                                        this.disableMapExtentEvents();
+                                                        this.setState({
+                                                            areaMethod: '',
+                                                            areaGeojson: null,
+                                                        })
+                                                }}/> : ''}</label>
                                                 <br/>
                                                 <div className="btn-group"
                                                      role="group"
@@ -171,6 +190,7 @@ class RequestServicePanel extends React.Component {
                                                             onClick={() => {
                                                                 this.handleAreaBtn(workOrder.id, 'draw');
                                                                 this.drawInMap();
+                                                                this.disableMapExtentEvents();
                                                             }}
                                                             className={`btn btn-outline-secondary ${this.state.areaMethod === 'draw' ? "btn-group-selected" : ""}`}>
                                                         Draw area
@@ -180,6 +200,7 @@ class RequestServicePanel extends React.Component {
                                                                 this.handleAreaBtn(workOrder.id, 'extent');
                                                                 this.clearDrawing();
                                                                 this.getMapExtent();
+                                                                this.enableMapExtentEvents();
                                                             }}
                                                             className={`btn btn-outline-secondary ${this.state.areaMethod === 'extent' ? "btn-group-selected" : ""}`}>
                                                         Use map extent
