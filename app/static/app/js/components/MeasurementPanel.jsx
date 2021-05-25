@@ -1,9 +1,11 @@
 import React from 'react';
+import '../css/MapPanel.scss';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 import Utils from '../classes/Utils';
 import SaveMeasurementDialog from './SaveMeasurementDialog';
 import {_} from "../classes/gettext";
+import MapPanel from "./MapPanel";
 
 
 class MeasurementPanel extends React.Component {
@@ -157,8 +159,7 @@ class MeasurementPanel extends React.Component {
                     saveAction={this.uploadMeasurement}
                     ref={(domNode) => { this.projectDialog = domNode; }}
                 />
-                <div style={{position: "absolute", zIndex: 9999, width: "300px"}} className="measurementPanel">
-                    <p className={"panelTitle"}>TOOLS</p>
+                <MapPanel title={"TOOLS"}>
                     <div id="accordion">
                         <div className="card">
                             <div className="card-header" id="headingOne">
@@ -200,7 +201,7 @@ class MeasurementPanel extends React.Component {
                             </div>
                         </div>
                     </div>
-                </div>
+                </MapPanel>
             </div>
         );
     }

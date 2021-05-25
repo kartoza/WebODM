@@ -8,6 +8,8 @@ import '../vendor/leaflet/L.Control.MousePosition.css';
 import '../vendor/leaflet/L.Control.MousePosition';
 import '../vendor/leaflet/Leaflet.Autolayers/css/leaflet.auto-layers.css';
 import '../vendor/leaflet/Leaflet.Autolayers/leaflet-autolayers';
+import '../vendor/leaflet/Leaflet.Draw/leaflet.draw';
+import '../vendor/leaflet/Leaflet.Draw/leaflet.draw.css';
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 // import '../vendor/leaflet/L.TileLayer.NoGap';
@@ -66,12 +68,15 @@ class Map extends React.Component {
       overlays: [],
       measurementData: [],
       measurementLayers: [],
-      workOrderTypeList: []
+      workOrderTypeList: [],
+      serviceLayer: null
     };
 
     this.basemaps = {};
     this.mapBounds = null;
     this.autolayers = null;
+    this.draw = null;
+    this.serviceLayer = null;
     this.addedCameraShots = false;
     this.newMeasurementData = [];
 
@@ -419,6 +424,11 @@ class Map extends React.Component {
     });
   }
 
+  isDrawing() {
+      // Check if the draw mode is on
+      return !!$(".leaflet-draw-toolbar-button-enabled")[0];
+  }
+
   componentDidMount() {
     const { showBackground, tiles } = this.props;
 
@@ -504,6 +514,28 @@ _('Example:'),
       baseLayers: this.basemaps
     }).addTo(this.map);
 
+    this.draw = new Leaflet.Control.Draw({
+        position:'bottomleft',
+        draw: {
+            polygon: {
+                allowIntersection: false, // Restricts shapes to simple polygons
+                drawError: {
+                    color: '#e1e100', // Color the shape will turn when intersects
+                    message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+                },
+                shapeOptions: {
+                    color: '#30bfd6',
+                    border: '#30bfd6'
+                }
+            },
+        }
+    }).addTo(this.map);
+    const serviceLayer = new Leaflet.FeatureGroup();
+    this.map.addLayer(serviceLayer);
+    this.setState({
+        serviceLayer: serviceLayer
+    })
+
     // Drag & Drop overlays
     const addDnDZone = (container, opts) => {
         const mapTempLayerDrop = new Dropzone(container, opts);
@@ -560,6 +592,9 @@ _('Example:'),
         this.map.fitBounds(this.mapBounds);
 
         this.map.on('click', e => {
+          if (this.isDrawing()) {
+              return
+          }
           // Find first tile layer at the selected coordinates 
           for (let layer of this.state.imageryLayers){
             if (layer._map && layer.options.bounds.contains(e.latlng)){
@@ -618,6 +653,7 @@ _('Example:'),
       tiles: tiles,
       controls:{
         autolayers: this.autolayers,
+        draw: this.draw,
         scale: scaleControl,
         zoom: zoomControl
       }
@@ -678,7 +714,7 @@ _('Example:'),
             <div>
                 <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
                 <MeasurementTable measurementData={this.state.measurementData}/>
-            </div> : <RequestServicePanel workOrderTypeList={this.state.workOrderTypeList}/>
+            </div> : <RequestServicePanel map={this.state.map} serviceLayer={this.state.serviceLayer} workOrderTypeList={this.state.workOrderTypeList}/>
         }
         <div className="opacity-slider theme-secondary hidden-xs">
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
