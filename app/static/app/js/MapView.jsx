@@ -7,6 +7,7 @@ import { _, interpolate } from './classes/gettext';
 import { createBrowserHistory } from "history";
 import {HashRouter} from "react-router-dom";
 import MapTools from './classes/MapTools';
+import Storage from "./classes/Storage";
 
 const history = createBrowserHistory();
 
@@ -16,7 +17,8 @@ class MapView extends React.Component {
     selectedMapType: 'orthophoto',
     map: null,
     title: "",
-    public: false
+    public: false,
+    user: {}
   };
 
   static propTypes = {
@@ -24,7 +26,8 @@ class MapView extends React.Component {
       selectedMapType: PropTypes.oneOf(['orthophoto', 'plant', 'dsm', 'dtm']),
       title: PropTypes.string,
       public: PropTypes.bool,
-      history: PropTypes.object
+      history: PropTypes.object,
+      user: PropTypes.object
   };
 
   constructor(props){
@@ -35,6 +38,8 @@ class MapView extends React.Component {
       currentMap: null,
       mapTool: MapTools.measurementTool
     };
+
+    Storage.setItem('user', JSON.stringify(props.user));
 
     this.getTilesByMapType = this.getTilesByMapType.bind(this);
     this.handleMapTypeButton = this.handleMapTypeButton.bind(this);
@@ -146,6 +151,7 @@ class MapView extends React.Component {
 $(function(){
     $("[data-mapview]").each(function(){
         let props = $(this).data();
+        console.log(props)
         props.history = history;
         delete(props.mapview);
         window.ReactDOM.render(<HashRouter><MapView {...props}/></HashRouter>, $(this).get(0));

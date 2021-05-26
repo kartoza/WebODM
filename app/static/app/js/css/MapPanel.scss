@@ -1,0 +1,107 @@
+.map-panel {
+  background-color: #1a2326;
+  padding: 10px;
+  border-radius: 0.5em;
+  font-size: 0.8em;
+  margin-top: 1em;
+  margin-left: 1em;
+
+  textarea {
+    resize: none !important;
+  }
+
+  .card {
+    opacity: 95%;
+    color: white;
+    border: 0;
+  }
+
+  .card-header {
+    background-color: #1a2326;
+    color: white;
+    border-radius: 0;
+    border: 1px solid #294348;
+    font-size: 1.1em;
+    padding: 0;
+  }
+
+  .card-header:hover {
+    cursor: pointer;
+  }
+
+  .card-header {
+    p {
+      color: white;
+      margin-bottom: 0 !important;
+    }
+  }
+
+  button:focus {
+    outline: 0 !important;
+    border: 0;
+  }
+
+  .btn {
+    font-size: 1.1em !important;
+  }
+
+  .btn-group {
+    width: 100%;
+  }
+
+  .btn-primary:active {
+    background-color: #346f28 !important;
+  }
+
+  .btn-primary:focus {
+    background-color: #346f28 !important;
+  }
+
+  .card-selected {
+    border-left: 4px solid #32c8e0;
+    border-right: 4px solid #32c8e0;
+    border-top: 1px solid #32c8e0;
+    border-bottom: 1px solid #32c8e0;
+  }
+
+  .form-control:focus {
+    border-color: #32c8e0;
+  }
+
+  .form-control:disabled, .form-control[readonly] {
+    background-color: #18292d;
+    opacity: 1;
+    color: #ffffff70 !important;
+  }
+
+  .form-control {
+    background-color: #18292d;
+    opacity: 1;
+    color: #ffffff !important;
+  }
+
+  .form-control {
+    border-color: #18292d;
+  }
+
+  .btn-outline-secondary {
+    border: 1px solid #32c8e0;
+    color: #32c8e0 !important;
+  }
+
+  .btn-outline-secondary:hover, .btn-group-selected {
+    color: #ffffff !important;
+    background-color: #32c8e0 !important;
+  }
+
+  .clear-service-area:hover {
+    cursor: pointer;
+  }
+
+  .form-select {
+    background-color: #18292d !important;
+    color: #ffffff !important;
+    border: 1px solid #32c8e0;
+  }
+
+}
