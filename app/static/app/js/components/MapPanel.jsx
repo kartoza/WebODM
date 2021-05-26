@@ -21,7 +21,7 @@ class MapPanel extends React.Component {
 
     render() {
         return (
-            <div style={{position: "absolute", zIndex: 9999, width: "30em"}}
+            <div style={{position: "absolute", zIndex: 998, width: "30em"}}
                  className="map-panel">
                 <p className={"panelTitle"}>{this.props.title}</p>
                 {this.props.children}

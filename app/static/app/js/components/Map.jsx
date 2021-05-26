@@ -154,7 +154,11 @@ class Map extends React.Component {
                   transparent: true,
               }
               let wmsLayer = L.tileLayer.wms(geoserverUrl + '/gwc/service/wms', wmsOptions);
-              wmsLayer[Symbol.for("meta")] = {name: layer.title, icon: icon};
+              wmsLayer[Symbol.for("meta")] = {
+                  name: layer.title,
+                  icon: icon,
+                  id: layer.id
+              };
               const bbox = userLayer.getBoundingBox(layer.layer);
               if (bbox)
                 wmsLayer.options['bounds'] = userLayer.getBoundingBox(layer.layer);
@@ -203,7 +207,10 @@ class Map extends React.Component {
 
                                         if (!err) {
                                             tempLayer.addTo(self.map);
-                                            tempLayer[Symbol.for("meta")] = {name: filename};
+                                            tempLayer[Symbol.for("meta")] = {
+                                                name: filename,
+                                                id: measurementData.id
+                                            };
                                             for (const [key, value] of Object.entries(tempLayer._layers)) {
                                                 const feature = value.feature;
                                                 feature.properties['name'] = measurementData.label;
@@ -714,7 +721,12 @@ _('Example:'),
             <div>
                 <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
                 <MeasurementTable measurementData={this.state.measurementData}/>
-            </div> : <RequestServicePanel map={this.state.map} serviceLayer={this.state.serviceLayer} workOrderTypeList={this.state.workOrderTypeList}/>
+            </div> : <RequestServicePanel map={this.state.map}
+                                          serviceLayer={this.state.serviceLayer}
+                                          measurementLayers={this.state.measurementLayers}
+                                          overlayLayers={this.state.overlays}
+                                          imageryLayers={this.state.imageryLayers}
+                                          workOrderTypeList={this.state.workOrderTypeList}/>
         }
         <div className="opacity-slider theme-secondary hidden-xs">
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />

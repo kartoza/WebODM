@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import Storage from "../classes/Storage";
 import update from "immutability-helper";
 import MapPanel from "./MapPanel";
+import {interpolate} from "../classes/gettext";
+var _ = require('lodash');
 
 
 class RequestServicePanel extends React.Component {
@@ -14,14 +16,22 @@ class RequestServicePanel extends React.Component {
         serviceLayer: PropTypes.object,
         areaGeojson: PropTypes.object,
         areaDrawn: PropTypes.bool,
-        specialInstructions: PropTypes.string
+        measurementLayers: PropTypes.Array,
+        overlayLayers: PropTypes.Array,
+        imageryLayers: PropTypes.Array,
+        specialInstructions: PropTypes.string,
+        selectedLayer: PropTypes.object
     };
 
     static defaultProps = {
         map: null,
         areaDrawn: false,
         areaGeojson: null,
+        selectedLayer: null,
         workOrderTypeList: [],
+        measurementLayers: [],
+        imageryLayers: [],
+        overlayLayers: [],
         specialInstructions: '',
         areaMethod: '',
         serviceLayer: null,
@@ -46,6 +56,8 @@ class RequestServicePanel extends React.Component {
         this.disableMapExtentEvents = this.disableMapExtentEvents.bind(this);
         this.enableMapExtentEvents = this.enableMapExtentEvents.bind(this);
         this.getMapExtent = this.getMapExtent.bind(this);
+        this.layerOptions = this.layerOptions.bind(this);
+        this.requestService = this.requestService.bind(this);
     }
 
     getInitialState = (props) => {
@@ -132,6 +144,14 @@ class RequestServicePanel extends React.Component {
         })
     }
 
+    requestService() {
+        if (window.confirm(interpolate('Are you sure you want to request "%(service)s"?', { service: this.state.selectedWorkOrder.name}))){
+          console.log("Requested");
+        } else {
+          console.log("Canceled");
+        }
+    }
+
     componentDidMount() {
         const that = this;
         if (that.props.map) {
@@ -148,6 +168,26 @@ class RequestServicePanel extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        this.disableMapExtentEvents();
+        this.clearDrawing();
+    }
+
+    layerOptions(layers, title = "Layers", prefix = "layer", id = "id") {
+        const getId = (layer) => {
+            return `${prefix}_${_.get(layer[Symbol.for("meta")], id)}`
+        }
+        return (
+            <optgroup label={title}>
+                {layers.map((layer) =>
+                    _.get(layer[Symbol.for("meta")], id) ?
+                        <option selected={getId(layer) === this.state.selectedLayer}
+                                value={getId(layer)}>
+                            { layer[Symbol.for("meta")].name }</option> : ''
+                )}
+            </optgroup>
+        )
+    }
 
     render() {
         return (
@@ -172,6 +212,22 @@ class RequestServicePanel extends React.Component {
                                                 <p>{workOrder.description}</p>
                                             </div>
                                             <hr/>
+                                            <div className="mb-3 align-items-center">
+                                                <label className="col-form-label control-label">Layer</label>
+                                                <select
+                                                    className="form-select form-select-sm" onChange={this.handleChange('selectedLayer')}>
+                                                    <option value="" selected="selected" disabled>Select layer</option>
+                                                    {
+                                                        this.layerOptions(this.props.overlayLayers, "Overlays", "overlay")
+                                                    }
+                                                    {
+                                                        this.layerOptions(this.props.measurementLayers, "Measurement Layers", "measurement")
+                                                    }
+                                                    {
+                                                        this.layerOptions(this.props.imageryLayers, "ODM Layers", "imagery", "task.id")
+                                                    }
+                                                </select>
+                                            </div>
                                             <div className="mb-2 align-items-center">
                                                 <label
                                                     className="col-form-label control-label">Area {this.state.areaGeojson ? <span className="fas fa-redo clear-service-area" onClick={() => {
@@ -209,10 +265,10 @@ class RequestServicePanel extends React.Component {
                                             </div>
                                             <div className="mb-1 align-items-center">
                                                 <label className="col-form-label control-label">Special Instructions</label>
-                                                <input type="text" className="form-control" value={this.state.specialInstructions} onChange={this.handleChange('specialInstructions')}/>
+                                                <textarea className="form-control form-control-sm" value={this.state.specialInstructions} onChange={this.handleChange('specialInstructions')}/>
                                             </div>
                                             <div className="mt-2" style={{ display: 'flex', flexDirection: "column" }}>
-                                                <button className="btn btn-success btn-request btn-disabled" disabled={!this.state.areaGeojson}>Request</button>
+                                                <button className="btn btn-success btn-request btn-disabled" disabled={!this.state.areaGeojson} onClick={() => this.requestService()}>Request</button>
                                             </div>
                                         </div>
                                     </div>

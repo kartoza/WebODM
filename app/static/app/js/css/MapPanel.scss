@@ -6,6 +6,10 @@
   margin-top: 1em;
   margin-left: 1em;
 
+  textarea {
+    resize: none !important;
+  }
+
   .card {
     opacity: 95%;
     color: white;
@@ -93,4 +97,11 @@
   .clear-service-area:hover {
     cursor: pointer;
   }
+
+  .form-select {
+    background-color: #18292d !important;
+    color: #ffffff !important;
+    border: 1px solid #32c8e0;
+  }
+
 }
