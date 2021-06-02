@@ -64,7 +64,10 @@ class RequestServicePanel extends React.Component {
         return {
             selectedWorkOrder: props.selectedWorkOrder,
             user: JSON.parse(Storage.getItem('user')),
-            specialInstructions: ''
+            specialInstructions: '',
+            selectedLayer: null,
+            areaMethod: '',
+            areaGeojson: null
         };
     }
 
@@ -109,6 +112,13 @@ class RequestServicePanel extends React.Component {
         this.props.map.off('dragend', this.getMapExtent);
     }
 
+    reset() {
+        $("#work-order-layer-select option").first().attr("selected", "selected");
+        this.clearDrawing();
+        this.disableMapExtentEvents();
+        this.setState(this.getInitialState(this.props));
+    }
+
     enableMapExtentEvents() {
         this.props.map.on('zoomend', this.getMapExtent);
         this.props.map.on('dragend', this.getMapExtent);
@@ -140,15 +150,57 @@ class RequestServicePanel extends React.Component {
             ]
         }
         this.setState({
+            areaDrawn: false,
             areaGeojson: geojson
         })
     }
 
+     getLayerId = (layer, prefix = "layer", id = "id") => {
+        return `${prefix}_${_.get(layer[Symbol.for("meta")], id)}`
+    }
+
     requestService() {
-        if (window.confirm(interpolate('Are you sure you want to request "%(service)s"?', { service: this.state.selectedWorkOrder.name}))){
-          console.log("Requested");
+        if (window.confirm(interpolate('Are you sure you want to request "%(service)s"?', { service: this.state.selectedWorkOrder.name }))){
+            let measurement_layers = [];
+            let resource_layers = [];
+            let imagery_layers = [];
+            this.props.overlayLayers.forEach(layer => {
+                if (this.getLayerId(layer, 'overlay') === this.state.selectedLayer) {
+                    resource_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
+                }
+            })
+            this.props.measurementLayers.forEach(layer => {
+                if (this.getLayerId(layer, 'measurement') === this.state.selectedLayer) {
+                    measurement_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
+                }
+            })
+            this.props.imageryLayers.forEach(layer => {
+                if (this.getLayerId(layer, 'imagery', 'task.id') === this.state.selectedLayer) {
+                    imagery_layers.push(_.get(layer[Symbol.for("meta")], 'task.id'))
+                }
+            })
+            let postData = {
+                'type': this.state.selectedWorkOrder.id,
+                'special_instructions': this.state.specialInstructions,
+                'area_type': this.state.areaDrawn ? 'draw' : 'extent',
+                'resource_layer_ids': resource_layers.join(),
+                'measurement_layer_ids': measurement_layers.join(),
+                'imagery_layer_uuids': imagery_layers.join(),
+                'area': this.state.areaGeojson
+            }
+            let that = this;
+            $.ajax({
+                url: `/api/work-order/`,
+                contentType: 'application/json',
+                dataType: 'json',
+                type: 'POST',
+                data: JSON.stringify(postData)
+            }).done((workOrder) => {
+                this.reset();
+            }).fail(() => {
+            });
         } else {
-          console.log("Canceled");
+            // Canceled
         }
     }
 
@@ -174,15 +226,12 @@ class RequestServicePanel extends React.Component {
     }
 
     layerOptions(layers, title = "Layers", prefix = "layer", id = "id") {
-        const getId = (layer) => {
-            return `${prefix}_${_.get(layer[Symbol.for("meta")], id)}`
-        }
         return (
             <optgroup label={title}>
                 {layers.map((layer) =>
                     _.get(layer[Symbol.for("meta")], id) ?
-                        <option selected={getId(layer) === this.state.selectedLayer}
-                                value={getId(layer)}>
+                        <option selected={this.getLayerId(layer, prefix, id) === this.state.selectedLayer}
+                                value={this.getLayerId(layer, prefix, id)}>
                             { layer[Symbol.for("meta")].name }</option> : ''
                 )}
             </optgroup>
@@ -215,8 +264,9 @@ class RequestServicePanel extends React.Component {
                                             <div className="mb-3 align-items-center">
                                                 <label className="col-form-label control-label">Layer</label>
                                                 <select
+                                                    id="work-order-layer-select"
                                                     className="form-select form-select-sm" onChange={this.handleChange('selectedLayer')}>
-                                                    <option value="" selected="selected" disabled>Select layer</option>
+                                                    <option value="" selected="selected">Select layer</option>
                                                     {
                                                         this.layerOptions(this.props.overlayLayers, "Overlays", "overlay")
                                                     }
