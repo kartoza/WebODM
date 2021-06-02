@@ -17,7 +17,7 @@ class MeasurementPanel extends React.Component {
          super(props);
 
          this.state = {
-             loading: false,
+             loading: true,
              map: null,
              startMeasuring: false,
              measurementFeatures: [],
