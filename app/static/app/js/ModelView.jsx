@@ -596,12 +596,13 @@ class ModelView extends React.Component {
           </div>
 
           <div className="model-action-buttons">
-            <AssetDownloadButtons
+            {this.state.selectedLayer && this.state.selectedLayer.available_assets.length > 0 ?
+              <AssetDownloadButtons
                             task={this.props.task}
                             direction="up"
                             showLabel={false}
-                            buttonClass="btn-secondary" />
-            {(!this.props.public) ?
+                            buttonClass="btn-secondary" /> : null }
+            {(!this.props.public && this.props.layers.length === 0) ?
             <ShareButton
                 ref={(ref) => { this.shareButton = ref; }}
                 task={this.props.task}
