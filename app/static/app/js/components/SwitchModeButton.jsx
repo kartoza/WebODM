@@ -15,7 +15,8 @@ class SwitchModeButton extends React.Component {
     task: PropTypes.object, // The object should contain two keys: {id: <taskId>, project: <projectId>}
     type: PropTypes.string, // Either "mapToModel" or "modelToMap"
     public: PropTypes.bool, // Whether to use public or private URLs
-    style: PropTypes.object
+    style: PropTypes.object,
+    url: PropTypes.string
   };
 
   constructor(props){
@@ -28,6 +29,10 @@ class SwitchModeButton extends React.Component {
   }
 
   handleClick(){
+    if (this.props.url) {
+      location.href = this.props.url;
+      return;
+    }
     if (this.props.task){
       const target = this.props.type === 'mapToModel' ? '3d' : 'map';
 

@@ -1,0 +1,48 @@
+.map-3d-panel {
+  .layers-control-panel-3d {
+    background: url(../icons/layers.svg) 0 0 no-repeat;
+    border-bottom: 0 !important;
+    background-color: #1a2326 !important;
+    background-size: 30px 30px;
+    border-radius: 2px;
+    background-position: 5px 4px;
+    padding: 1.25em;
+  }
+
+  .layers-control-panel-3d:hover {
+    cursor: pointer;
+  }
+
+  a {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+  }
+
+  a:first-child {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+  }
+
+  .left-space {
+    margin-left: 0;
+  }
+
+  .layers-control-layer {
+    padding-left: 1em;
+  }
+
+  .form-check-input {
+    margin-top: 2px;
+  }
+
+  .overlayIcon {
+    float: left;
+    width: 45px;
+  }
+
+  .layers-control-panel * {
+    font-size: 1em !important;
+  }
+}
