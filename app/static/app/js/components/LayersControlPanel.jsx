@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/LayersControlPanel.scss';
 import LayersControlLayer from './LayersControlLayer';
+import LayersMenuDropdown from "./LayersMenuDropdown";
 import { _ } from '../classes/gettext';
 import {ExpandButton} from "./Toggle";
 
@@ -71,7 +72,7 @@ export default class LayersControlPanel extends React.Component {
 
     return (<div className="layers-control-panel">
       <span className="close-button" onClick={this.props.onClose}/>
-      <div className="title">{_("Layers")}</div>
+      <LayersMenuDropdown title={_("Layers")}/>
       <hr/>
       {content}
     </div>);
