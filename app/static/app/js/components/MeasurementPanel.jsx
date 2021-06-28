@@ -11,7 +11,8 @@ import MapPanel from "./MapPanel";
 class MeasurementPanel extends React.Component {
     static propTypes = {
         measurementUpdated: PropTypes.func,
-        map: PropTypes.object.isRequired
+        map: PropTypes.object.isRequired,
+        enable: PropTypes.bool
     };
      constructor(props) {
          super(props);
@@ -19,6 +20,7 @@ class MeasurementPanel extends React.Component {
          this.state = {
              loading: true,
              map: null,
+             enable: false,
              startMeasuring: false,
              measurementFeatures: [],
              mode: ''
@@ -37,6 +39,13 @@ class MeasurementPanel extends React.Component {
      }
 
     componentDidMount() {
+         if (this.props.map && this.state.loading) {
+             this.setState({
+                 loading: false,
+                 map: this.props.map,
+                 mode: '2d'
+             })
+         }
     }
 
     componentDidUpdate() {
@@ -163,13 +172,16 @@ class MeasurementPanel extends React.Component {
                     <div id="accordion">
                         <div className="card">
                             <div className="card-header" id="headingOne">
-                                <div className="panelMenu"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#collapseOne"
-                                        aria-expanded="true"
-                                        aria-controls="collapseOne">
-                                    {this.state.loading ? <p>Loading...</p> : <p>Measure Volume</p>}
-                                </div>
+                                {this.props.enable ?
+                                    <div className="panelMenu"
+                                         data-bs-toggle="collapse"
+                                         data-bs-target="#collapseOne"
+                                         aria-expanded="true"
+                                         aria-controls="collapseOne">
+                                        {this.state.loading ?
+                                            <p>Loading...</p> :
+                                            <p>Measure Volume</p>}
+                                    </div> : null}
                             </div>
                             <div id="collapseOne" className="collapse"
                                  aria-labelledby="headingOne"
