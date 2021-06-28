@@ -31,7 +31,7 @@ export default class LayersControlPanel extends React.Component {
   render(){
     let content = "";
 
-    if (!this.props.layers.length) content = (<span><i className="loading fa fa-circle-notch fa-spin"></i> {_("Loading…")}</span>);
+    if (!this.props.layers.length) content = (<span></span>);
     else{
       content = (<div>
         {this.props.overlays.length ?

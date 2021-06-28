@@ -230,8 +230,7 @@ class RequestServicePanel extends React.Component {
             <optgroup label={title}>
                 {layers.map((layer) =>
                     _.get(layer[Symbol.for("meta")], id) ?
-                        <option selected={this.getLayerId(layer, prefix, id) === this.state.selectedLayer}
-                                value={this.getLayerId(layer, prefix, id)}>
+                        <option value={this.getLayerId(layer, prefix, id)}>
                             { layer[Symbol.for("meta")].name }</option> : ''
                 )}
             </optgroup>
@@ -265,8 +264,9 @@ class RequestServicePanel extends React.Component {
                                                 <label className="col-form-label control-label">Layer</label>
                                                 <select
                                                     id="work-order-layer-select"
+                                                    value={this.state.selectedLayer ? this.state.selectedLayer : ""}
                                                     className="form-select form-select-sm" onChange={this.handleChange('selectedLayer')}>
-                                                    <option value="" selected="selected">Select layer</option>
+                                                    <option value="">Select layer</option>
                                                     {
                                                         this.layerOptions(this.props.overlayLayers, "Overlays", "overlay")
                                                     }

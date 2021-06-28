@@ -596,7 +596,9 @@ _('Example:'),
     this.setState({showLoading: true});
     this.loadImageryLayers(true).then(() => {
         this.setState({showLoading: false});
-        this.map.fitBounds(this.mapBounds);
+        if (this.mapBounds) {
+            this.map.fitBounds(this.mapBounds);
+        }
 
         this.map.on('click', e => {
           if (this.isDrawing()) {
@@ -719,7 +721,9 @@ _('Example:'),
         <ErrorMessage bind={[this, 'error']} />
         { this.props.currentTool === MapTools.measurementTool ?
             <div>
-                <MeasurementPanel map={this.state.map} measurementUpdated={this.measurementUpdated}/>
+                { this.state.map ? <MeasurementPanel enable={this.state.imageryLayers.length > 0}
+                                                     map={this.state.map}
+                                                     measurementUpdated={this.measurementUpdated}/> : null }
                 <MeasurementTable measurementData={this.state.measurementData}/>
             </div> : <RequestServicePanel map={this.state.map}
                                           serviceLayer={this.state.serviceLayer}
@@ -732,7 +736,7 @@ _('Example:'),
             {_("Opacity:")} <input type="range" step="1" value={this.state.opacity} onChange={this.updateOpacity} />
         </div>
 
-        <Standby 
+        <Standby
             message={_("Loading...")}
             show={this.state.showLoading}
             />
@@ -742,10 +746,9 @@ _('Example:'),
           ref={(domNode) => (this.container = domNode)}
           onMouseDown={this.handleMapMouseDown}
         />
-
         <div className="actionButtons">
           {this.state.pluginActionButtons.map((button, i) => <div key={i}>{button}</div>)}
-          {(!this.props.public && this.state.singleTask !== null) ? 
+          {(!this.props.public && this.state.singleTask !== null && !this.props.allLayer) ?
             <ShareButton 
               ref={(ref) => { this.shareButton = ref; }}
               task={this.state.singleTask} 
@@ -754,7 +757,8 @@ _('Example:'),
           : ""}
           <SwitchModeButton 
             task={this.state.singleTask}
-            type="mapToModel" 
+            type="mapToModel"
+            url={this.props.allLayer ? "/3d-map/" : ""}
             public={this.props.public} />
         </div>
       </div>

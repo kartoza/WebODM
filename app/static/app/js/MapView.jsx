@@ -135,6 +135,7 @@ class MapView extends React.Component {
 
         <div className="map-container">
             <Map
+                allLayer={this.props.all_layer}
                 tiles={this.state.tiles}
                 showBackground={true}
                 mapType={this.state.selectedMapType}
@@ -151,7 +152,6 @@ class MapView extends React.Component {
 $(function(){
     $("[data-mapview]").each(function(){
         let props = $(this).data();
-        console.log(props)
         props.history = history;
         delete(props.mapview);
         window.ReactDOM.render(<HashRouter><MapView {...props}/></HashRouter>, $(this).get(0));
