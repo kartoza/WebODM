@@ -613,7 +613,7 @@ class ModelView extends React.Component {
             <SwitchModeButton
                 public={this.props.public}
                 task={this.props.task}
-                url={this.props.layers.length > 0 ? "/map/" : ""}
+                url={this.props.layers.length > 0 ? "/map/" : this.props.tasks ? "" : "/map/"}
                 type="modelToMap" />
         </div>
 
