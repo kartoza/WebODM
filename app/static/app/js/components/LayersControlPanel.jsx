@@ -27,6 +27,13 @@ export default class LayersControlPanel extends React.Component {
       measurementLayersExpanded: true,
       layersExpanded: true
     };
+    this.deselectAllBaseLayers = this.deselectAllBaseLayers.bind(this);
+  }
+
+  deselectAllBaseLayers() {
+    this.props.layers.forEach((layer, idx) => {
+      this.props.map.removeLayer(layer);
+    });
   }
 
   render(){
@@ -35,8 +42,29 @@ export default class LayersControlPanel extends React.Component {
     if (!this.props.layers.length) content = (<span></span>);
     else{
       content = (<div>
+        <div>
+          <div className="expand-button-container"><ExpandButton bind={[this, 'layersExpanded']} /><span style={{ marginTop: "auto", marginBottom: "auto" }}>Base Layers</span></div>
+          {this.state.layersExpanded ?
+            <div className="left-space">
+              {this.props.layers.sort((a, b) => {
+                  const m_a = a[Symbol.for("meta")] || {};
+                  const m_b = b[Symbol.for("meta")] || {};
+                  return m_a.name > m_b.name ? -1 : 1;
+              }).map((layer, i) =>
+                  <LayersControlLayer layerUpdated={this.deselectAllBaseLayers}
+                                      radio={true}
+                                      map={this.props.map}
+                                      expanded={this.props.layers.length === 1}
+                                      overlay={false}
+                                      layer={layer}
+                                      key={(layer[Symbol.for("meta")] || {}).name || i} />
+              )}
+            </div>
+          : "" }
+        </div>
         {this.props.overlays.length ?
             <div>
+              <br/>
               <div  className="expand-button-container"><ExpandButton bind={[this, 'overlaysExpanded']} /><span style={{ marginTop: "auto", marginBottom: "auto" }}>Overlays</span></div>
               {this.state.overlaysExpanded ?
               <div className="overlays theme-border-primary left-space">
@@ -54,19 +82,6 @@ export default class LayersControlPanel extends React.Component {
               </div> : ""}
           </div>
         : ""}
-        <div>
-          <br/>
-          <div className="expand-button-container"><ExpandButton bind={[this, 'layersExpanded']} /><span style={{ marginTop: "auto", marginBottom: "auto" }}>ODM Layers</span></div>
-          {this.state.layersExpanded ?
-            <div className="left-space">
-              {this.props.layers.sort((a, b) => {
-                  const m_a = a[Symbol.for("meta")] || {};
-                  const m_b = b[Symbol.for("meta")] || {};
-                  return m_a.name > m_b.name ? -1 : 1;
-              }).map((layer, i) => <LayersControlLayer map={this.props.map} expanded={this.props.layers.length === 1} overlay={false} layer={layer} key={(layer[Symbol.for("meta")] || {}).name || i} />)}
-            </div>
-          : "" }
-        </div>
       </div>);
     }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../css/LayersControlLayer.scss';
 import Histogram from './Histogram';
-import { Checkbox, ExpandButton } from './Toggle';
+import { Checkbox, ExpandButton, Radiobox } from './Toggle';
 import Utils from '../classes/Utils';
 import Workers from '../classes/Workers';
 import ErrorMessage from './ErrorMessage';
@@ -14,13 +14,16 @@ export default class LayersControlLayer extends React.Component {
       layer: null,
       expanded: false,
       map: null,
-      overlay: false
+      overlay: false,
+      radio: false
   };
   static propTypes = {
     layer: PropTypes.object.isRequired,
     expanded: PropTypes.bool,
     map: PropTypes.object.isRequired,
-    overlay: PropTypes.bool
+    overlay: PropTypes.bool,
+    radio: PropTypes.bool,
+    layerUpdated: PropTypes.func
   }
 
   constructor(props){
@@ -76,10 +79,16 @@ export default class LayersControlLayer extends React.Component {
     const { layer } = this.props;
 
     if (prevState.visible !== this.state.visible){
+        if (this.props.layerUpdated) {
+          this.props.layerUpdated();
+        }
         if (this.state.visible){
             layer.addTo(this.map);
         }else{
             this.map.removeLayer(layer);
+        }
+        if (layer[Symbol.for("layer-type")] === "base-layer" && this.state.visible) {
+          this.handleLayerClick();
         }
     }
 
@@ -270,7 +279,8 @@ export default class LayersControlLayer extends React.Component {
     }
 
     return (<div className="layers-control-layer">
-        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}<Checkbox bind={[this, 'visible']}/>
+        {!this.props.overlay ? <ExpandButton bind={[this, 'expanded']} /> : <div className="overlayIcon"><i className={meta.icon || "fa fa-vector-square fa-fw"}></i></div>}
+            {this.props.radio ? <Radiobox bind={[this, 'visible']}/> : <Checkbox bind={[this, 'visible']}/>}
         <a title={meta.name} className="layer-label" href="javascript:void(0);" onClick={this.handleLayerClick}>{meta.name}</a>
 
         {this.state.expanded ? 

@@ -37,6 +37,13 @@ class Checkbox extends Toggle{
     }
 }
 
+class Radiobox extends Toggle{
+    static defaultProps = {
+        trueIcon: "fa fa-circle",
+        falseIcon: "far fa-circle"
+    }
+}
+
 class ExpandButton extends Toggle{
     static defaultProps = {
         trueIcon: "fa fa-caret-down",
@@ -47,5 +54,6 @@ class ExpandButton extends Toggle{
 export {
     Toggle,
     Checkbox,
+    Radiobox,
     ExpandButton
 }
