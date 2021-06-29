@@ -316,9 +316,13 @@ class Map extends React.Component {
             meta.metaUrl = metaUrl;
             layer[Symbol.for("meta")] = meta;
             layer[Symbol.for("tile-meta")] = mres;
+            layer[Symbol.for("layer-type")] = "base-layer";
 
-            if (forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1){
+            if ((forceAddLayers || prevSelectedLayers.indexOf(layerId(layer)) !== -1) && this.state.imageryLayers.length === 0){
               layer.addTo(this.map);
+              let mapBounds = this.mapBounds || Leaflet.latLngBounds();
+              mapBounds.extend(bounds);
+              this.mapBounds = mapBounds;
             }
 
             // Show 3D switch button only if we have a single orthophoto
@@ -363,10 +367,6 @@ class Map extends React.Component {
             this.setState(update(this.state, {
                 imageryLayers: {$push: [layer]}
             }));
-
-            let mapBounds = this.mapBounds || Leaflet.latLngBounds();
-            mapBounds.extend(bounds);
-            this.mapBounds = mapBounds;
 
             // Add camera shots layer if available
             if (meta.task && meta.task.camera_shots && !this.addedCameraShots){
