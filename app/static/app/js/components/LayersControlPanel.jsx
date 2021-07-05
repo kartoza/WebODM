@@ -5,6 +5,7 @@ import LayersControlLayer from './LayersControlLayer';
 import LayersMenuDropdown from "./LayersMenuDropdown";
 import { _ } from '../classes/gettext';
 import {ExpandButton} from "./Toggle";
+import update from "immutability-helper";
 
 export default class LayersControlPanel extends React.Component {
   static defaultProps = {
@@ -22,17 +23,36 @@ export default class LayersControlPanel extends React.Component {
 
   constructor(props){
     super(props);
+    this.ref = {}
     this.state = {
       overlaysExpanded: true,
       measurementLayersExpanded: true,
-      layersExpanded: true
+      layersExpanded: true,
+      ref: {}
     };
-    this.deselectAllBaseLayers = this.deselectAllBaseLayers.bind(this);
+    this.deselectOtherLayers = this.deselectOtherLayers.bind(this);
   }
 
-  deselectAllBaseLayers() {
-    this.props.layers.forEach((layer, idx) => {
-      this.props.map.removeLayer(layer);
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.layers !== this.props.layers) {
+      this.props.layers.forEach((layer, i) => {
+        const key = (layer[Symbol.for("meta")] || {}).name || i;
+        if (!(key in this.state.ref)) {
+          let copyRef = { ...this.state.ref, [key]: React.createRef()}
+          this.setState({ref: copyRef});
+        }
+      });
+    }
+  }
+
+  deselectOtherLayers(excludedLayer) {
+    this.props.layers.forEach((layer, i) => {
+      if (layer !== excludedLayer) {
+        const key = (layer[Symbol.for("meta")] || {}).name || i;
+        this.state.ref[key].current.setState({
+          visible: false
+        })
+      }
     });
   }
 
@@ -51,12 +71,13 @@ export default class LayersControlPanel extends React.Component {
                   const m_b = b[Symbol.for("meta")] || {};
                   return m_a.name > m_b.name ? -1 : 1;
               }).map((layer, i) =>
-                  <LayersControlLayer layerUpdated={this.deselectAllBaseLayers}
+                  <LayersControlLayer layerUpdated={this.deselectOtherLayers}
                                       radio={true}
                                       map={this.props.map}
                                       expanded={this.props.layers.length === 1}
                                       overlay={false}
                                       layer={layer}
+                                      ref={this.state.ref[(layer[Symbol.for("meta")] || {}).name || i]}
                                       key={(layer[Symbol.for("meta")] || {}).name || i} />
               )}
             </div>
