@@ -77,7 +77,7 @@ export default class LayersControlLayer extends React.Component {
 
   componentDidUpdate(prevProps, prevState){
     const { layer } = this.props;
-
+    
     if (prevState.visible !== this.state.visible) {
       if (this.state.visible) {
         if (this.props.layerUpdated) {
@@ -90,12 +90,6 @@ export default class LayersControlLayer extends React.Component {
       if (layer[Symbol.for("layer-type")] === "base-layer" && this.state.visible) {
         this.handleLayerClick();
       }
-    }
-
-    if (!this.map.hasLayer(layer) && this.state.visible) {
-      this.setState({
-        visible: false
-      })
     }
 
     if (prevState.hillshade !== this.state.hillshade){
