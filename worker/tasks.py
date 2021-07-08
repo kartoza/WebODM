@@ -2,9 +2,12 @@ import os
 import shutil
 import tempfile
 import traceback
+import hashlib
+from celery_once import QueueOnce
 
 import time
 from threading import Event, Thread
+
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
@@ -17,7 +20,7 @@ from nodeodm import status_codes
 from nodeodm.models import ProcessingNode
 from webodm import settings
 import worker
-from .celery import app
+from stratafy.celery import app
 from app.raster_utils import export_raster_index as export_raster_index_sync
 
 logger = get_task_logger("app.logger")
@@ -86,31 +89,23 @@ def get_pending_tasks():
                                 Q(pending_action__isnull=False, partial=False))
 
 
-@app.task
+@app.task(base=QueueOnce)
 def process_task(taskId):
-    from app.utils.celery import memcache_lock
+    try:
+        task = Task.objects.get(pk=taskId)
+    except ObjectDoesNotExist:
+        logger.info("Task {} has already been deleted.".format(taskId))
+        return
 
-    lock_id = 'task_lock_{}'.format(taskId)
-
-    with memcache_lock(lock_id) as acquired:
-        if acquired:
-            try:
-                task = Task.objects.get(pk=taskId)
-            except ObjectDoesNotExist:
-                logger.info("Task {} has already been deleted.".format(taskId))
-                return
-
-            try:
-                task.process()
-            except Exception as e:
-                logger.error(
-                    "Uncaught error! This is potentially bad. "
-                    "Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
-                        e, traceback.format_exc()))
-                if settings.TESTING: raise e
-            return
-        logger.info(
-            'Task %s has already being processed by another worker', lock_id)
+    try:
+        task.process()
+    except Exception as e:
+        logger.error(
+            "Uncaught error! This is potentially bad. "
+            "Please report it to http://github.com/OpenDroneMap/WebODM/issues: {} {}".format(
+                e, traceback.format_exc()))
+        if settings.TESTING: raise e
+    return
 
 
 @app.task
