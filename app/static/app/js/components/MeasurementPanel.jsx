@@ -45,6 +45,14 @@ class MeasurementPanel extends React.Component {
                  map: this.props.map,
                  mode: '2d'
              })
+             this.props.map.on('volumecalculated', (data) => {
+                this.setState({
+                    startMeasuring: false
+                })
+                 setTimeout(() => {
+                     this.getMeasurementFeatures()
+                 }, 100)
+             });
          }
     }
 
@@ -55,15 +63,6 @@ class MeasurementPanel extends React.Component {
                  map: this.props.map,
                  mode: '2d'
              })
-
-             this.props.map.on('volumeCalculated', ({popupContainer, model, resultFeature}) => {
-                this.setState({
-                    startMeasuring: false
-                })
-                 setTimeout(() => {
-                     this.getMeasurementFeatures()
-                 }, 100)
-             });
          }
     }
 

@@ -95,7 +95,7 @@ export default class MeasurePopup extends React.Component {
                       else{
                           Workers.getOutput(result.celery_task_id, (error, volume) => {
                               if (error) this.setState({error});
-                              else { this.setState({volume: parseFloat(volume)}); this.props.map.fire("volumeCalculated"); };
+                              else { this.setState({volume: parseFloat(volume)}); this.props.map.fire("volumecalculated", parseFloat(volume)); };
                           }, `/api/plugins/measure/task/${task.id}/volume/get/`);
                       }
                     }, `/api/plugins/measure/task/${task.id}/volume/check/`);
