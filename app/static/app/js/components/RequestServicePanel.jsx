@@ -5,6 +5,9 @@ import Storage from "../classes/Storage";
 import update from "immutability-helper";
 import MapPanel from "./MapPanel";
 import {interpolate} from "../classes/gettext";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import '../css/Alert.scss';
 var _ = require('lodash');
 
 
@@ -58,6 +61,7 @@ class RequestServicePanel extends React.Component {
         this.getMapExtent = this.getMapExtent.bind(this);
         this.layerOptions = this.layerOptions.bind(this);
         this.requestService = this.requestService.bind(this);
+        this.confirmService = this.confirmService.bind(this);
     }
 
     getInitialState = (props) => {
@@ -160,48 +164,72 @@ class RequestServicePanel extends React.Component {
     }
 
     requestService() {
-        if (window.confirm(interpolate('Are you sure you want to request "%(service)s"?', { service: this.state.selectedWorkOrder.name }))){
-            let measurement_layers = [];
-            let resource_layers = [];
-            let imagery_layers = [];
-            this.props.overlayLayers.forEach(layer => {
-                if (this.getLayerId(layer, 'overlay') === this.state.selectedLayer) {
-                    resource_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
-                }
-            })
-            this.props.measurementLayers.forEach(layer => {
-                if (this.getLayerId(layer, 'measurement') === this.state.selectedLayer) {
-                    measurement_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
-                }
-            })
-            this.props.imageryLayers.forEach(layer => {
-                if (this.getLayerId(layer, 'imagery', 'task.id') === this.state.selectedLayer) {
-                    imagery_layers.push(_.get(layer[Symbol.for("meta")], 'task.id'))
-                }
-            })
-            let postData = {
-                'type': this.state.selectedWorkOrder.id,
-                'special_instructions': this.state.specialInstructions,
-                'area_type': this.state.areaDrawn ? 'draw' : 'extent',
-                'resource_layer_ids': resource_layers.join(),
-                'measurement_layer_ids': measurement_layers.join(),
-                'imagery_layer_uuids': imagery_layers.join(),
-                'area': this.state.areaGeojson
+        let measurement_layers = [];
+        let resource_layers = [];
+        let imagery_layers = [];
+        this.props.overlayLayers.forEach(layer => {
+            if (this.getLayerId(layer, 'overlay') === this.state.selectedLayer) {
+                resource_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
             }
-            let that = this;
-            $.ajax({
-                url: `/api/work-order/`,
-                contentType: 'application/json',
-                dataType: 'json',
-                type: 'POST',
-                data: JSON.stringify(postData)
-            }).done((workOrder) => {
-                this.reset();
-            }).fail(() => {
-            });
-        } else {
-            // Canceled
+        })
+        this.props.measurementLayers.forEach(layer => {
+            if (this.getLayerId(layer, 'measurement') === this.state.selectedLayer) {
+                measurement_layers.push(_.get(layer[Symbol.for("meta")], 'id'))
+            }
+        })
+        this.props.imageryLayers.forEach(layer => {
+            if (this.getLayerId(layer, 'imagery', 'task.id') === this.state.selectedLayer) {
+                imagery_layers.push(_.get(layer[Symbol.for("meta")], 'task.id'))
+            }
+        })
+        let postData = {
+            'type': this.state.selectedWorkOrder.id,
+            'special_instructions': this.state.specialInstructions,
+            'area_type': this.state.areaDrawn ? 'draw' : 'extent',
+            'resource_layer_ids': resource_layers.join(),
+            'measurement_layer_ids': measurement_layers.join(),
+            'imagery_layer_uuids': imagery_layers.join(),
+            'area': this.state.areaGeojson
         }
+        let that = this;
+        $.ajax({
+            url: `/api/work-order/`,
+            contentType: 'application/json',
+            dataType: 'json',
+            type: 'POST',
+            data: JSON.stringify(postData)
+        }).done((workOrder) => {
+            this.reset();
+        }).fail((error) => {
+            confirmAlert({
+                title: 'Error',
+                message: error.responseText,
+                buttons: [
+                    {
+                        label: 'Ok',
+                        className: "btn btn-cancel"
+                    }
+                ]
+            });
+        });
+    }
+
+    confirmService() {
+        confirmAlert({
+            title: 'Confirm to submit',
+            message: interpolate('Are you sure you want to request "%(service)s"?', {service: this.state.selectedWorkOrder.name}),
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => this.requestService(),
+                    className: "btn btn-success"
+                },
+                {
+                    label: 'Cancel',
+                    className: "btn btn-cancel"
+                }
+            ]
+        });
     }
 
     componentDidMount() {
@@ -319,7 +347,7 @@ class RequestServicePanel extends React.Component {
                                                 <textarea className="form-control form-control-sm" value={this.state.specialInstructions} onChange={this.handleChange('specialInstructions')}/>
                                             </div>
                                             <div className="mt-2" style={{ display: 'flex', flexDirection: "column" }}>
-                                                <button className="btn btn-success btn-request btn-disabled" disabled={!this.state.areaGeojson} onClick={() => this.requestService()}>Request</button>
+                                                <button className="btn btn-success btn-request btn-disabled" disabled={!this.state.areaGeojson} onClick={() => this.confirmService()}>Request</button>
                                             </div>
                                         </div>
                                     </div>

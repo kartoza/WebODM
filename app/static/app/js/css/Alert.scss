@@ -1,0 +1,33 @@
+#react-confirm-alert {
+  font-size: 0.9em;
+
+  .react-confirm-alert-overlay {
+    background: rgba(255,255,255, 0) !important;
+  }
+
+  .react-confirm-alert-body {
+    background: rgb(41, 67, 72);
+    color: #fff;
+  }
+
+  .react-confirm-alert-body {
+    h1 {
+      font-size: 1.5em !important;
+    }
+  }
+
+  .btn {
+    border-radius: 15px;
+  }
+
+  .btn-success {
+    background-color: #65c555;
+    border-color: #65c555;
+  }
+
+  .btn-cancel {
+    background-color: rgba(255,255,255, 0);
+    color: #32c8e0 !important;
+    border: 1px solid #32c8e0;
+  }
+}
