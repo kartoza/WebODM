@@ -48,8 +48,8 @@ export default class LayersMenuDropdown extends React.Component {
               <Dropdown.Toggle variant="success" id="dropdown-basic" className="hidden-dropdown-btn"></Dropdown.Toggle>
               <Dropdown.Menu className="resource-dropdown-menu">
                 <Dropdown.Item href="/useradmin/resource/document/" eventKey="option-1"><i className="fa fa-list fa-fw"></i> {_("User Documents")}</Dropdown.Item>
-                <Dropdown.Item href="/useradmin/resource/layer/" eventKey="option-2"><i className="fa fa-list fa-fw"></i> {_("User Layers")}</Dropdown.Item>
-                <Dropdown.Item href="/useradmin/resource/measurement/" eventKey="option-3"><i className="fa fa-list fa-fw"></i> {_("User Layers")}</Dropdown.Item>
+                <Dropdown.Item href="/admin_user/stratafy/resourcelayer/" eventKey="option-2"><i className="fa fa-list fa-fw"></i> {_("User Layers")}</Dropdown.Item>
+                <Dropdown.Item href="/useradmin/resource/measurement/" eventKey="option-3"><i className="fa fa-list fa-fw"></i> {_("Measurement Layers")}</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
         </div>)
