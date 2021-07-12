@@ -15,8 +15,8 @@ def theme(color):
     try:
         return getattr(load()['SETTINGS'].theme, color)
     except Exception as e:
-        logger.warning("Cannot load configuration from theme(): " + e.message)
-        return "blue" # dah buh dih ah buh daa..
+        logger.warning("Cannot load configuration from theme(): " + str(e))
+        return "#FFFFFF" # dah buh dih ah buh daa..
 
 
 def complementary(hexcolor):
