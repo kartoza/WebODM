@@ -258,6 +258,7 @@ class RequestServicePanel extends React.Component {
                                         <div className="card-body" style={{ backgroundColor: "#294348" }}>
                                             <div className="mb-2 align-items-center">
                                                 <p>{workOrder.description}</p>
+                                                <p>Cost : {workOrder.credit_cost}</p>
                                             </div>
                                             <hr/>
                                             <div className="mb-3 align-items-center">
@@ -274,7 +275,7 @@ class RequestServicePanel extends React.Component {
                                                         this.layerOptions(this.props.measurementLayers, "Measurement Layers", "measurement")
                                                     }
                                                     {
-                                                        this.layerOptions(this.props.imageryLayers, "ODM Layers", "imagery", "task.id")
+                                                        this.layerOptions(this.props.imageryLayers, "Base Layers", "imagery", "task.id")
                                                     }
                                                 </select>
                                             </div>
